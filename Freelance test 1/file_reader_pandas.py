@@ -11,15 +11,11 @@ def create_search(goods_file):
             search_text = ''
             one_row = df.loc[i, ['product_title', 'trademark', 'value', 'unit']]
             one_row = one_row.values.astype(str)
-            for i in one_row:
-                words = " ".join(i.split())
-                word = word.replace(',','')
-                if words != '0':
-                    search_text += words + ' '
+            search_text = f'{one_row[0].replace(",","")}+{one_row[1]}+{one_row[2]}{one_row[3]}'
         else:
             search_text = df.loc[i, 'description']
             search_text = search_text.replace(',','')
-        # search_text = search_text.strip().replace(" ",'+')
+        search_text = search_text.strip().replace("  ",' ').replace(" ","+")
         # return search_text
         print(search_text)
 
