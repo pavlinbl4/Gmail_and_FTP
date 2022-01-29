@@ -79,7 +79,7 @@ def replace_symbols(search_text):
 
 def create_search(goods_file):  # 1. получаю строку поиска из предоставленного файла
     df = pd.read_excel(goods_file)
-    for i in range(201,251):    # for i in range(len(df)):
+    for i in range(251,len(df)):    # for i in range(len(df)):
         product_id = df.loc[i, 'product_id']
         if df.loc[i, 'description'] == 0:  # товара нет в поле описания, результат заносим в отдельный файл
             one_row = df.loc[i, ['product_title', 'trademark', 'value', 'unit']]
