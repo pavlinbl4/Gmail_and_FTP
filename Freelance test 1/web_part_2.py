@@ -103,7 +103,7 @@ def create_search(goods_file):  # 1. получаю строку поиска и
 
 
 def get_html(url):
-    time.sleep(random.randrange(3,10))
+    time.sleep(random.randrange(10,40))
     req = requests.get(url)
     return req.text
 
