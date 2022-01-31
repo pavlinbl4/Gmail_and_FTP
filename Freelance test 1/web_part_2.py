@@ -5,7 +5,8 @@ import csv
 import re
 import time
 import random
-
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 # goods_file = '/Volumes/big4photo/Downloads/products_no_barcode.xlsx'
 goods_file = '/Users/evgeniy/Downloads/products_no_barcode.xlsx'
@@ -80,7 +81,7 @@ def replace_symbols(search_text):
 
 def create_search(goods_file):  # 1. получаю строку поиска из предоставленного файла
     df = pd.read_excel(goods_file)
-    for i in range(475,len(df)):    # for i in range(len(df)):
+    for i in range(1400,len(df)):    # for i in range(len(df)):
         product_id = df.loc[i, 'product_id']
         print(f"запрос по id {product_id}")
         if df.loc[i, 'description'] == 0:  # товара нет в поле описания, результат заносим в отдельный файл
@@ -104,10 +105,23 @@ def create_search(goods_file):  # 1. получаю строку поиска и
             add_barcode_to_file(search_data)  # в description есть товар записываю штрих код  в исходный файл файл
 
 
+# def get_html(url):
+#     time.sleep(random.randrange(10,20))
+#     req = requests.get(url)
+#     return req.text
+
 def get_html(url):
-    time.sleep(random.randrange(10,20))
-    req = requests.get(url)
-    return req.text
+    time.sleep(random.randrange(2,40))
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session.get(url).text
+
+
+
+
 
 
 def get_data(html, search_data):  # функция парсящая сайт по созданному запросу и возвращающая информацию
