@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-
-from selenium.webdriver.common.keys import Keys
 import time
 
 driver = webdriver.Firefox()
@@ -10,14 +8,11 @@ driver = webdriver.Firefox()
 site = "http://1kas.sudrf.ru/modules.php?name=sud_delo#"
 driver.get(site)
 driver.find_element(By.ID, "top_menu").find_element(By.TAG_NAME, "b").click()
-time.sleep(1)
+driver.implicitly_wait(5)
 driver.find_element(By.NAME, "dic").click()
 
 driver.find_element(By.ID, 'popup')
 driver.find_element(By.CLASS_NAME, "bsrLawBook").find_element(By.NAME, "lwbart-sublevel").click()
-
-# driver.find_element(By.ID,"lwbart-inp-560001").click()
-
 
 check_box = driver.find_element(By.ID, "lwbart-inp-780000")
 actions = ActionChains(driver)
@@ -31,9 +26,17 @@ driver.find_element(By.ID, "lwbart-inp-780030").click()
 driver.find_element(By.ID, "lwbart-inp-780040").click()
 
 driver.find_element(By.ID, "cat_close").find_element(By.TAG_NAME, "a").click()
-time.sleep(20)
+
+time.sleep(3)
+driver.implicitly_wait(5)
 
 driver.find_element(By.NAME, "Submit").click()
-time.sleep(20)
+time.sleep(3)
+
+url = driver.current_url
+print(url)
+
+driver.save_screenshot('itog.png'
+)
 
 driver.close()
