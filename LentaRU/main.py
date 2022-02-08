@@ -2,6 +2,7 @@ import requests
 import json
 import csv
 import time
+import urllib.request
 
 
 def csv_writer(i):
@@ -12,8 +13,9 @@ def csv_writer(i):
 
 
 def get_html(url):
+    # r = urllib.request.Request(url)
     r = requests.get(url)
-    time.sleep(1)
+    time.sleep(2)
     return r.text
 
 
