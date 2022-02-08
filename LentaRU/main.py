@@ -2,7 +2,8 @@ import requests
 import json
 import csv
 import time
-import urllib.request
+import fake_headers
+
 
 
 def csv_writer(i):
@@ -13,9 +14,15 @@ def csv_writer(i):
 
 
 def get_html(url):
-    # r = urllib.request.Request(url)
-    r = requests.get(url)
-    time.sleep(2)
+    # headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0',
+    #            "accept": "*/*"}
+    headers = fake_headers.Headers().generate()
+    r = requests.get(url,headers=headers)
+    if r.status_code != 200:
+        time.sleep(7)
+        print("bad status code")
+        r = requests.get(url, headers=headers)
+    # print(r.status_code)
     return r.text
 
 
@@ -23,7 +30,8 @@ def main():
     number = 0
 
     while True:
-        url = f"https://lenta.ru/search/v2/process?from={str(number)}&size=10&sort=2&title_only=0&domain=1&modified,format=yyyy-MM-dd&query=Фото: Евгений Павленко / «Коммерсантъ»"
+        autor = "Фото: Александр Коряков / Коммерсантъ"  #    Фото: Евгений Павленко / «Коммерсантъ»
+        url = f"https://lenta.ru/search/v2/process?from={str(number)}&size=10&sort=2&title_only=0&domain=1&modified,format=yyyy-MM-dd&query={autor}"
         rezult = json.loads(get_html(url))
 
         number += 1
@@ -32,10 +40,13 @@ def main():
             print('empty json file')
             break
 
-        for i in rezult['matches']:
-            main_data = {'title': i['title'], 'image_url': i['image_url'], 'url': i['url'], 'pubdate': time.ctime(i['pubdate'])}
-            print(main_data)
-            csv_writer(main_data)
+        with open(f"data_file_{number}.json", "a") as write_file:
+            json.dump(rezult, write_file)
+
+        # for i in rezult['matches']:
+        #     main_data = {'title': i['title'], 'image_url': i['image_url'], 'url': i['url'], 'pubdate': time.ctime(i['pubdate'])}
+        #     print(main_data)
+        #     csv_writer(main_data)
 
 
 if __name__ == '__main__':
