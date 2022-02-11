@@ -9,14 +9,17 @@ import requests
 import openpyxl
 import os
 import report_date_from_file
+from selenium.webdriver.common.by import By
 
 options = webdriver.ChromeOptions()
 options.add_argument(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4200.0 Iron Safari/537.36")
 browser = webdriver.Chrome(options=options)
 
-file_way = '/Volumes/big4photo/Documents/TASS/2021_отчеты/Павленко_ноябрь_2021.xlsx'
+# file_way = '/Volumes/big4photo/Documents/TASS/2021_отчеты/Павленко_ноябрь_2021.xlsx'
+file_way = '/Volumes/big4photo/Downloads/Павленко.xlsx'
 wb = openpyxl.load_workbook(file_way)
+
 sheet = wb.active
 photos = {}
 x = 7
@@ -30,11 +33,11 @@ try:
 
     photo_id = (sheet.cell(row=x, column=4)).value
     while photo_id != None:
-        search_input = browser.find_element_by_id("userrequest")
+        search_input = browser.find_element(By.ID, "userrequest")
         search_input.clear()
         search_input.send_keys(photo_id)
-        browser.find_element_by_id("search-submit").click()
-        picture = browser.find_element_by_css_selector("#mosaic .zoom img").get_attribute("src")
+        browser.find_element(By.ID, "search-submit").click()
+        picture = browser.find_element(By.CSS_SELECTOR, "#mosaic .zoom img").get_attribute("src")
         print(picture)
         get_image = requests.get(picture)
         with open(f"/Volumes/big4photo/Documents/TASS/images/{report_date}/{photo_id}.jpg", 'wb') as img_file:
