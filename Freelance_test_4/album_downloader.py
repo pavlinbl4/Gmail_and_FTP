@@ -11,6 +11,8 @@ headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0)
            'Referer': 'https://3125tiger.x.yupoo.com/',
            'Connection': 'keep-alive'
            }
+
+
 def get_album_date(full_album_link):
     url = full_album_link
     html = get_html(url)
@@ -43,7 +45,7 @@ def work_with_album(full_album_link, album_name):
     soup = BeautifulSoup(html, 'lxml')
     pictures = soup.find_all('img', class_="autocover image__img image__portrait")  # нахожу все снимки в альбоме
     # album_date = soup.find('time', class_="text_overflow").text.strip()  # получаю дату создания альбома
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    # yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     # if album_date == datetime.now().strftime("%Y-%m-%d"):  # если альбом сегодняшни, то скачиваю его
     # if date == yesterday:  # если альбом вчерашний, то скачиваю его
     for picture in pictures:  # перебираю список снимков в альбоме и получаю ссылку на хайрез
@@ -51,9 +53,10 @@ def work_with_album(full_album_link, album_name):
         download_image(picture_link, album_name)  # запускаю качалку хайреза
 
 
-
 def get_html(url):
     r = requests.get(url, headers=headers)
+    print(r.status_code)
+
     return r.text
 
 
@@ -63,19 +66,21 @@ def main():
     soup = BeautifulSoup(html, 'lxml')
     albums = soup.find_all(class_="showindex__children")  # нахожу все альбомы на странице
     count = 0
-    for album in albums:  # нахожу ссылку на каждый альбом
-        # while count < 10:  # цикл ограничивающий количество скачиваемых альбомов за раз больше для тестирования
-        album_link = album.find(class_="album__main").get('href')
-        album_name = str(album.find(class_="text_overflow album__title").text)
+    # for album in albums:  # нахожу ссылку на каждый альбом
+    print(len(albums))
+    for i in range(20):  # перебираю первые 20 альбомов
+        album_link = albums[i].find(class_="album__main").get('href')
+        album_name = str(albums[i].find(class_="text_overflow album__title").text)
         full_album_link = f'https://3125tiger.x.yupoo.com{album_link}'
-        album_date = get_album_date(full_album_link) # получаю дату альбома со страницы сайта
+        album_date = get_album_date(full_album_link)  # получаю дату альбома со страницы сайта
+        print(f'album_name - {album_name}, album_date - {album_date}, count - {count}')
         if album_date == datetime.now().strftime("%Y-%m-%d"):  # если альбом сегодняшни, то скачиваю его
             print(album_name)
             print(full_album_link)
             today = datetime.now().strftime("%Y-%m-%d")  # на всякий случай записываю дату скачивания альбома
             write_album_name([album_name, today, full_album_link])  # записываю информацию о скачиваемом альбоме
             work_with_album(full_album_link, album_name)  # запускаю скачивание
-            # count += 1
+        count += 1
 
 
 if __name__ == "__main__":
