@@ -1,5 +1,5 @@
 """
-проверяю как работает селениум и устанавливаю умную задержку на открытие сайта
+проверяю как работает селениум
 """
 
 from selenium import webdriver
@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 
-# url = 'https://www.tassphoto.com/ru'
+
 url ='https://www.tassphoto.com/ru/asset/fullTextSearch/search/%D0%A1%D0%B5%D0%BC%D0%B5%D0%BD%20%D0%9B%D0%B8%D1%85%D0%BE%D0%B4%D0%B5%D0%B5%D0%B2/page/'
 
 options = webdriver.ChromeOptions()
@@ -42,6 +42,4 @@ browser.quit()
 
 
 
-# if __name__ == "__main__":
-#     get_html()
 
