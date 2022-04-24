@@ -27,17 +27,6 @@ options.add_argument("--disable-blink-features=AutomationControlled")
 browser = webdriver.Chrome(options=options)
 
 
-def new_pictures_links(last_date, previous_date):
-    pd.options.display.max_colwidth = 100
-    photo_base = '/Volumes/big4photo/Documents/TASS/Tass_data/all_TASS_images.xlsx'
-    last_df = pd.read_excel(photo_base, sheet_name=last_date)
-    previos_df = pd.read_excel(photo_base, sheet_name=previous_date)
-    difference = datacompy.Compare(previos_df, last_df,
-                                   join_columns=['image_id', 'image_date', 'image_caption']).df2_unq_rows
-
-    return difference
-
-
 def image_downloader(difference, last_date):
     folder = '/Volumes/big4photo/Documents/TASS/Tass_data/added_images'
     os.makedirs(f"{folder}/{last_date}", exist_ok=True)
@@ -45,11 +34,20 @@ def image_downloader(difference, last_date):
         image_url = difference.image_link.iloc[i]
         r = requests.get(image_url)
         image_name = re.findall(r'\d+(?=\.thw)', image_url)[0]
-        print(image_name)
-
+        print(image_name, image_url)
         with open(f"{folder}/{last_date}/{image_name}.jpg", 'wb') as download_file:
             for chunk in r.iter_content(9000):
                 download_file.write(chunk)
+
+
+def new_pictures_links(last_date, previous_date):
+    pd.options.display.max_colwidth = 100
+    photo_base = '/Volumes/big4photo/Documents/TASS/Tass_data/all_TASS_images.xlsx'
+    last_df = pd.read_excel(photo_base, sheet_name=last_date)
+    previos_df = pd.read_excel(photo_base, sheet_name=previous_date)
+    difference = datacompy.Compare(previos_df, last_df,
+                                   join_columns=['image_id', 'image_date', 'image_caption']).df2_unq_rows
+    return difference
 
 
 def get_html(link):
@@ -67,7 +65,7 @@ def get_html(link):
     return html
 
 
-def parser():
+def parser():  # функция возвращает количество опубликованных на сайте снимков
     link = 'https://www.tassphoto.com/ru'
     html = get_html(link)
     soup = BeautifulSoup(html, 'lxml')
@@ -79,30 +77,26 @@ def add_data(photos_count):
     book = load_workbook(file)
     ws = book.active
     last_row = ws.max_row
-
     old_value = ws.cell(row=last_row, column=2).value  # последние данные в таблице
-
-    last_date = f'{ws.cell(row=last_row, column=1).value[:10]}'
-    previous_date = f'{ws.cell(row=(last_row - 1), column=1).value[:10]}'
-
+    last_date = f'{ws.cell(row=last_row, column=1).value[:10]}' # дата внесения последних данных
+    previous_date = f'{ws.cell(row=(last_row - 1), column=1).value[:10]}' # дата внесения предпоследних данных
     if ws.cell(row=last_row, column=2).value != photos_count:
         ws.cell(row=last_row + 1, column=2).value = photos_count
         ws.cell(row=last_row + 1, column=1).value = datetime.now().strftime('%Y-%m-%d %H:%M')
-        new_images = int(photos_count) - int(old_value)
+        new_images = int(photos_count) - int(old_value)  # количество добавленных фото
         ws.cell(row=last_row + 1, column=3).value = new_images
         print(f'добавлено {new_images} снимков')
-        subprocess.run([sys.executable, 'all_images_new.py'])
-        difference = new_pictures_links(last_date, previous_date)
-        image_downloader(difference, last_date)
+        subprocess.run([sys.executable, 'all_images_new.py']) # запусакаю субпроцесс для записи даным по всем фотографиям в файл
+        print('subprocess1 - ended')
+        subprocess.run([sys.executable, 'download_fresh_images.py'])
+        # difference = new_pictures_links(last_date, previous_date)
+        # image_downloader(difference, last_date)
 
     else:
         print(f"no new images, now  {photos_count} - images online")
 
     book.save(file)
     book.close()
-
-    # difference = new_pictures_links(last_date, previous_date)
-    # image_downloader(difference, last_date)
 
 
 add_data(parser())
