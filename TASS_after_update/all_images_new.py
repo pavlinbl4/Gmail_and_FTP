@@ -18,6 +18,7 @@ options = webdriver.ChromeOptions()
 options.add_argument(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4200.0 Iron Safari/537.36")
 options.add_argument("--disable-blink-features=AutomationControlled")
+options.headless = True
 
 browser = webdriver.Chrome(options=options)
 
@@ -45,8 +46,8 @@ def get_soup(html):
 
 def get_page_nambers(url):  # количество страниц с которых нужно  собрать информацию
     soup = get_soup(get_html(f'{url}1'))
-    print(soup)
-    print(soup.select(".result-counter#nb-result"))
+    # print(soup)
+    # print(soup.select(".result-counter#nb-result"))
     images_online = int(str(soup.select(".result-counter#nb-result"))[42:47])
     page_number = images_online // 20 + 1
     return page_number, images_online
@@ -97,7 +98,7 @@ def main():
             image_caption = soup.find('ul', id="mosaic").find_all(class_="thumb-text")[i].text.strip().split('\n')[
                 -1].lstrip().replace(' Семен Лиходеев/ТАСС', '').replace(' Фото ИТАР-ТАСС/ Семен Лиходеев','')
             image_link = soup.find('ul', id="mosaic").find_all('a', class_="zoom")[i].find('img').get('src')
-            print(count, image_id, image_date)
+            print(count - 1, image_id, image_date)
             print(image_title)
             print(image_caption)
             print(image_link)
