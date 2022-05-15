@@ -1,6 +1,8 @@
 """
 данный скрипт хорошо работает с современными отчетами тасс
-с 2015 года по 2021
+с 2015 года по 2022 включительно
+проверен 8 апреля 2022
+
 """
 
 import os
@@ -132,7 +134,7 @@ def move_and_rename(file_name, report_dir, destination):  # переименов
 
 def find_report(report_dir, destination):  # поск заданных файлов в папке загрузок
     list_of_files = os.listdir(report_dir)
-    pattern = 'Павленко_*.xlsx'
+    pattern = 'Павленко*.xlsx'
     count = 0
     for file_name in list_of_files:
         if fnmatch.fnmatch(file_name, pattern):
